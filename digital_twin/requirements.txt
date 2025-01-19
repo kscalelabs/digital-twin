@@ -2,7 +2,4 @@
 
 colorlogging
 kscale
-mujoco
-mujoco-python-viewer
 pykos
-keyboard
