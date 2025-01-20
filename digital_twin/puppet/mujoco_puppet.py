@@ -62,10 +62,10 @@ class MujocoPuppet(Puppet):
             if self.mj_model is None or self.mj_data is None:
                 self.mj_model = mujoco.MjModel.from_xml_path(str(mjcf_path))
 
-                # If fixed_base is True, disable gravity to make the robot float in place
-                if self.fixed_base:
-                    self.mj_model.opt.gravity[2] = 0  # Set vertical gravity to 0
-                    logger.info("Disabled gravity for fixed base mode")
+                # # If fixed_base is True, disable gravity to make the robot float in place
+                # if self.fixed_base:
+                #     self.mj_model.opt.gravity[2] = 0  # Set vertical gravity to 0
+                #     logger.info("Disabled gravity for fixed base mode")
 
                 self.mj_data = mujoco.MjData(self.mj_model)
 
@@ -103,27 +103,18 @@ class MujocoPuppet(Puppet):
             mj_viewer.close()
             raise RuntimeError("MuJoCo viewer is not running")
 
-        # TODO: This is not implemented correctly.
-        kp = 1.0
+        # Directly set joint positions
         for name, target_pos in joint_angles.items():
-            actuator_id = self.actuator_ids[name]
-            if actuator_id <= 0:
-                continue
-            current_pos = mj_data.qpos[actuator_id]
-            tau = kp * (target_pos - current_pos)
-            mj_data.ctrl[actuator_id] = tau
+            joint_id = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_JOINT, name)
+            if joint_id >= 0:  # Valid joint ID
+                # We're 6-indexed because the first 7 elements of qpos are the root joint
+                mj_data.qpos[joint_id + 6] = target_pos
 
-        # Steps to the current time.
-        if self.last_time is None:
-            self.last_time = asyncio.get_running_loop().time()
-        current_time = asyncio.get_running_loop().time()
-        sim_time = current_time - self.last_time
-        self.last_time = current_time
-        while sim_time > 0:
-            mujoco.mj_step(mj_model, mj_data)
-            sim_time -= mj_model.opt.timestep
+        # Update positions
+        mujoco.mj_forward(mj_model, mj_data)
 
         # Track and log FPS
+        current_time = asyncio.get_running_loop().time()
         now = current_time
         if self.last_render_time is not None:
             frame_time = now - self.last_render_time
@@ -145,15 +136,16 @@ class MujocoPuppet(Puppet):
 async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("mjcf_name", type=str, help="Name of the Mujoco model in the K-Scale API")
-    parser.add_argument("--no-skip-root", action="store_true", help="Do not skip the root joint")
     args = parser.parse_args()
 
     colorlogging.configure()
 
     puppet = MujocoPuppet(args.mjcf_name)
     joint_names = await puppet.get_joint_names()
-    if not args.no_skip_root:
-        joint_names = joint_names[1:]
+
+    # Always skip the root joint
+    joint_names = joint_names[1:]
+
     actor = SinusoidActor(joint_names)
 
     while True:
