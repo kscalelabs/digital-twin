@@ -19,6 +19,8 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+SIMULATION_TIMESTEP = 1 / 240
+
 
 class PyBulletTargetRobot(TargetRobot):
     """Target robot model using PyBullet."""
@@ -98,7 +100,26 @@ class PyBulletTargetRobot(TargetRobot):
                 for joint_id in range(pybullet.getNumJoints(self.robot_id, physicsClientId=physics_client)):
                     info = pybullet.getJointInfo(self.robot_id, joint_id, physicsClientId=physics_client)
                     if info[2] != pybullet.JOINT_FIXED:  # Skip fixed joints
-                        # Disable default motor control and add damping
+                        joint_name = info[1].decode("utf-8")
+
+                        # Set reasonable defaults if limits are zero or invalid
+                        max_force = info[10] if info[10] > 0 else 100.0
+                        max_velocity = info[11] if info[11] > 0 else 10.0
+
+                        # Add joint damping based on joint type and limits
+                        joint_range = abs(info[9] - info[8]) if info[8] < info[9] else 2 * 3.14159
+                        damping = 0.5 * max_force / joint_range  # Scale damping with joint range
+                        damping = min(damping, 5.0)  # Cap maximum damping
+
+                        pybullet.changeDynamics(
+                            self.robot_id,
+                            joint_id,
+                            jointDamping=damping,
+                            maxJointVelocity=max_velocity,
+                            physicsClientId=physics_client,
+                        )
+
+                        # Disable default motor control
                         pybullet.setJointMotorControl2(
                             self.robot_id,
                             joint_id,
@@ -107,18 +128,15 @@ class PyBulletTargetRobot(TargetRobot):
                             force=0,
                             physicsClientId=physics_client,
                         )
-                        # Add joint damping to prevent free motion
-                        pybullet.changeDynamics(
-                            self.robot_id, joint_id, jointDamping=1.0, physicsClientId=physics_client
-                        )
 
-                        self.joint_info[info[1].decode("utf-8")] = {
+                        self.joint_info[joint_name] = {
                             "id": joint_id,
                             "type": info[2],
                             "lower_limit": info[8],
                             "upper_limit": info[9],
-                            "max_force": info[10],
-                            "max_velocity": info[11],
+                            "max_force": max_force,
+                            "max_velocity": max_velocity,
+                            "damping": damping,
                         }
 
                 logger.info("Loaded robot with %d controllable joints", len(self.joint_info))
@@ -139,32 +157,64 @@ class PyBulletTargetRobot(TargetRobot):
         if not pybullet.isConnected(physicsClientId=physics_client):
             raise RuntimeError("PyBullet physics server is not running")
 
-        # Set joint positions using position control
+        # Get current joint positions
+        current_positions = {}
+        current_velocities = {}
+        for joint_name, info in joint_info.items():
+            joint_state = pybullet.getJointState(robot_id, info["id"], physicsClientId=physics_client)
+            current_positions[joint_name] = joint_state[0]
+            current_velocities[joint_name] = joint_state[1]
+
+        # Calculate time step
+        current_time = asyncio.get_running_loop().time()
+        if self.last_time is None:
+            dt = 1 / 240  # Default PyBullet timestep
+        else:
+            dt = current_time - self.last_time
+        self.last_time = current_time
+
+        # Set joint positions using position control with velocity limits
         for joint_name, target_pos in joint_angles.items():
             if joint_name in joint_info:
                 joint_id = joint_info[joint_name]["id"]
+                current_pos = current_positions[joint_name]
+                current_vel = current_velocities[joint_name]
+
+                # Calculate velocity that would be needed to reach target
+                position_error = target_pos - current_pos
+
+                # Use PD control for smoother motion
+                kp = 1.0  # Position gain
+                kd = 0.1  # Velocity damping
+                desired_velocity = (kp * position_error) / dt
+                desired_velocity -= kd * current_vel  # Add velocity damping
+
+                # Clamp velocity to joint limits
+                max_velocity = joint_info[joint_name]["max_velocity"]
+                clamped_velocity = max(-max_velocity, min(max_velocity, desired_velocity))
+
+                # Scale force based on position error
+                max_force = joint_info[joint_name]["max_force"]
+                force_scale = min(1.0, abs(position_error))
+
+                # Use position control with velocity limiting
                 pybullet.setJointMotorControl2(
                     robot_id,
                     joint_id,
                     pybullet.POSITION_CONTROL,
-                    target_pos,
-                    force=joint_info[joint_name]["max_force"],
+                    targetPosition=target_pos,
+                    targetVelocity=clamped_velocity,
+                    force=max_force * force_scale,
+                    maxVelocity=abs(clamped_velocity),
                     physicsClientId=physics_client,
                 )
 
-        # Step simulation
-        if self.last_time is None:
-            self.last_time = asyncio.get_running_loop().time()
-        current_time = asyncio.get_running_loop().time()
-        sim_time = current_time - self.last_time
-        self.last_time = current_time
-
-        # PyBullet timestep is 1/240 seconds
-        num_steps = int(sim_time * 240)
+        # Step simulation with fixed timestep
+        num_steps = max(1, int(dt / SIMULATION_TIMESTEP))
         for _ in range(num_steps):
             pybullet.stepSimulation(physicsClientId=physics_client)
 
-        # Track and log FPS
+        # FPS tracking code
         now = current_time
         if self.last_render_time is not None:
             frame_time = now - self.last_render_time
@@ -172,7 +222,6 @@ class PyBulletTargetRobot(TargetRobot):
             if len(self.frame_times) > self.fps_window_size:
                 self.frame_times.pop(0)
 
-            # Log FPS periodically
             if now >= self.next_fps_log:
                 avg_frame_time = sum(self.frame_times) / len(self.frame_times)
                 fps = 1.0 / avg_frame_time if avg_frame_time > 0 else 0

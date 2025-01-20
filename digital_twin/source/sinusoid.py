@@ -9,7 +9,7 @@ from digital_twin.source.base import SourceRobot
 class SinusoidSourceRobot(SourceRobot):
     """Source robot model that generates sinusoidal joint angles."""
 
-    def __init__(self, joint_names: list[str], amplitude: float = math.radians(5), frequency: float = 1.0) -> None:
+    def __init__(self, joint_names: list[str], amplitude: float = math.radians(30), frequency: float = 1.0) -> None:
         self.joint_names = joint_names
         self.amplitude = amplitude
         self.frequency = frequency
