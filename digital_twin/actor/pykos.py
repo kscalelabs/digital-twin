@@ -2,7 +2,7 @@
 
 from pykos import KOS
 
-from digital_twin.source.base import SourceRobot
+from digital_twin.actor.base import SourceRobot
 
 
 class PyKOSRobot(SourceRobot):

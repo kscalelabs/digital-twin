@@ -3,7 +3,7 @@
 import math
 import time
 
-from digital_twin.source.base import SourceRobot
+from digital_twin.actor.base import SourceRobot
 
 
 class SinusoidSourceRobot(SourceRobot):

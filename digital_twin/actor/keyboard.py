@@ -2,7 +2,7 @@
 
 from pynput import keyboard
 
-from digital_twin.source.base import SourceRobot
+from digital_twin.actor.base import SourceRobot
 
 
 class KeyboardSourceRobot(SourceRobot):

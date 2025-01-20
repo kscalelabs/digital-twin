@@ -1,4 +1,4 @@
-"""Defines the base source robot model, which generates the actions."""
+"""Defines the base source robot model, which generates actions."""
 
 import logging
 from abc import ABC, abstractmethod

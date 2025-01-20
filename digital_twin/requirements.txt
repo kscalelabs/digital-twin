@@ -3,3 +3,4 @@
 colorlogging
 kscale
 pykos
+pynput

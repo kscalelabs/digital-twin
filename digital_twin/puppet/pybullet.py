@@ -8,8 +8,8 @@ from pathlib import Path
 import colorlogging
 import kscale
 
-from digital_twin.source.sinusoid import SinusoidSourceRobot
-from digital_twin.target.base import TargetRobot
+from digital_twin.actor.sinusoid import SinusoidSourceRobot
+from digital_twin.puppet.base import TargetRobot
 
 try:
     import pybullet
