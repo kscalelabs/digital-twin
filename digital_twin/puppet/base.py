@@ -1,10 +1,10 @@
-"""Defines the base target robot model, which mirrors the source robot actions."""
+"""Defines the base puppet robot model, which mirrors the actor robot actions."""
 
 from abc import ABC, abstractmethod
 
 
-class TargetRobot(ABC):
-    """Target robot model."""
+class Puppet(ABC):
+    """Puppet robot model."""
 
     @abstractmethod
     def get_joint_names(self) -> list[str]: ...

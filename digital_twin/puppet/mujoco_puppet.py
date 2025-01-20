@@ -8,8 +8,8 @@ from pathlib import Path
 import colorlogging
 import kscale
 
-from digital_twin.actor.sinusoid import SinusoidSourceRobot
-from digital_twin.puppet.base import TargetRobot
+from digital_twin.actor.sinusoid import SinusoidActor
+from digital_twin.puppet.base import Puppet
 
 try:
     import mujoco
@@ -21,8 +21,8 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class MujocoTargetRobot(TargetRobot):
-    """Target robot model using Mujoco."""
+class MujocoPuppet(Puppet):
+    """Puppet robot model using Mujoco."""
 
     def __init__(self, name: str, fixed_base: bool = True) -> None:
         self.name = name
@@ -150,15 +150,15 @@ async def main() -> None:
 
     colorlogging.configure()
 
-    target_robot = MujocoTargetRobot(args.mjcf_name)
-    joint_names = await target_robot.get_joint_names()
+    puppet = MujocoPuppet(args.mjcf_name)
+    joint_names = await puppet.get_joint_names()
     if not args.no_skip_root:
         joint_names = joint_names[1:]
-    source_robot = SinusoidSourceRobot(joint_names)
+    actor = SinusoidActor(joint_names)
 
     while True:
-        joint_angles = await source_robot.get_joint_angles()
-        await target_robot.set_joint_angles(joint_angles)
+        joint_angles = await actor.get_joint_angles()
+        await puppet.set_joint_angles(joint_angles)
         await asyncio.sleep(0.01)
 
 

@@ -4,10 +4,15 @@ This repository helps you easily create a digital twin of your robot.
 
 ## Getting Started
 
-First, you need to supply a kscale API key as an environment variable: 
-
+First, you need to authenticate with the kscale api by running
 ```
-export KSCALE_API_KEY=<your-api-key>
+pip install kscale
+kscale user key
+```
+
+To list all the robots you can use as puppets, run
+```
+kscale robots list
 ```
 
 ## Digital Twin Structure
@@ -24,6 +29,7 @@ These are your digital twin robots. They receive actions from the actors and mir
 These are the sources of actions for your puppet robots. Essentially your input sources. Currently, we support the following actor types:
 
 - [Keyboard](digital_twin/actor/keyboard.py)
+- [Sinusoid](digital_twin/actor/sinusoid.py)
 - [PyKOS](digital_twin/actor/pykos.py)
     - gRPC client for KOS-compatible robots
 

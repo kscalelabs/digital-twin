@@ -1,11 +1,11 @@
-"""Defines a source robot model that communicates with a robot using PyKOS."""
+"""Defines an actor robot model that communicates with a robot using PyKOS."""
 
 from pykos import KOS
 
-from digital_twin.actor.base import SourceRobot
+from digital_twin.actor.base import ActorRobot
 
 
-class PyKOSRobot(SourceRobot):
+class PyKOSActor(ActorRobot):
     """Interface for communicating with a robot using PyKOS."""
 
     def __init__(

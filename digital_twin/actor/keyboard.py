@@ -1,12 +1,12 @@
-"""Defines a source robot model that allows for keyboard control."""
+"""Defines an actor robot model that allows for keyboard control."""
 
 from pynput import keyboard
 
-from digital_twin.actor.base import SourceRobot
+from digital_twin.actor.base import ActorRobot
 
 
-class KeyboardSourceRobot(SourceRobot):
-    """Source robot model that allows for keyboard control."""
+class KeyboardActor(ActorRobot):
+    """Actor robot model that allows for keyboard control."""
 
     def __init__(self, joint_names: list[str]) -> None:
         self.current_index = 0

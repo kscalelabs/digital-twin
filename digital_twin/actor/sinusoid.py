@@ -1,13 +1,13 @@
-"""Defines a source robot model that generates sinusoidal joint angles."""
+"""Defines an actor robot model that generates sinusoidal joint angles."""
 
 import math
 import time
 
-from digital_twin.actor.base import SourceRobot
+from digital_twin.actor.base import ActorRobot
 
 
-class SinusoidSourceRobot(SourceRobot):
-    """Source robot model that generates sinusoidal joint angles."""
+class SinusoidActor(ActorRobot):
+    """Actor robot model that generates sinusoidal joint angles."""
 
     def __init__(self, joint_names: list[str], amplitude: float = math.radians(30), frequency: float = 1.0) -> None:
         self.joint_names = joint_names

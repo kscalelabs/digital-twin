@@ -8,8 +8,8 @@ from pathlib import Path
 import colorlogging
 import kscale
 
-from digital_twin.actor.sinusoid import SinusoidSourceRobot
-from digital_twin.puppet.base import TargetRobot
+from digital_twin.actor.sinusoid import SinusoidActor
+from digital_twin.puppet.base import Puppet
 
 try:
     import pybullet
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 SIMULATION_TIMESTEP = 1 / 240
 
 
-class PyBulletTargetRobot(TargetRobot):
+class PyBulletPuppet(Puppet):
     """Target robot model using PyBullet."""
 
     def __init__(self, name: str, fixed_base: bool = True) -> None:
@@ -239,15 +239,15 @@ async def main() -> None:
 
     colorlogging.configure()
 
-    target_robot = PyBulletTargetRobot(args.mjcf_name)
-    joint_names = await target_robot.get_joint_names()
+    puppet = PyBulletPuppet(args.mjcf_name)
+    joint_names = await puppet.get_joint_names()
     if not args.no_skip_root:
         joint_names = joint_names[1:]
-    source_robot = SinusoidSourceRobot(joint_names)
+    actor = SinusoidActor(joint_names)
 
     while True:
-        joint_angles = await source_robot.get_joint_angles()
-        await target_robot.set_joint_angles(joint_angles)
+        joint_angles = await actor.get_joint_angles()
+        await puppet.set_joint_angles(joint_angles)
         await asyncio.sleep(0.01)
 
 

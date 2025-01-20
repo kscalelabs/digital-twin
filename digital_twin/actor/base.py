@@ -1,4 +1,4 @@
-"""Defines the base source robot model, which generates actions."""
+"""Defines the base actor robot model, which generates actions."""
 
 import logging
 from abc import ABC, abstractmethod
@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 logger = logging.getLogger(__name__)
 
 
-class SourceRobot(ABC):
+class ActorRobot(ABC):
     """Abstract base class for robot models."""
 
     @abstractmethod
