@@ -1,3 +1,3 @@
-# digital_twin
+# Digital Twin
 
-Welcome to the digital_twin project!
+This repository helps you easily create a digital twin of your robot.
