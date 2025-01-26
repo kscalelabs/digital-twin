@@ -25,7 +25,7 @@ version: str = version_re.group(1)
 
 
 setup(
-    name="kscale-digital-twin",
+    name="digital_twin",
     version=version,
     description="The digital_twin project",
     author="Benjamin Bolte",

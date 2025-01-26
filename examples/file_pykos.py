@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from pykos import KOS
 
@@ -191,20 +192,26 @@ async def main() -> None:
             configs = ZbotConfigs()
         case "kbot-v1":
             configs = KbotConfigs()
+        case "kbot-v1-naked":
+            configs = KbotNakedConfigs()
         case _:
             raise ValueError(f"No configs for {args.mjcf_name}")
 
-    kos = KOS(ip=args.ip)
-    actor = PyKOSActor(kos, configs.joint_mapping, kos_signs=configs.signs)
-    actor.offset_in_place()
-    print(f"Offsets: {actor.get_offsets()}")
-    puppet = MujocoPuppet(args.mjcf_name)
+    async with KOS(ip=args.ip) as kos:
+        actor = PyKOSActor(kos, configs.joint_mapping, kos_signs=configs.signs)
+        await actor.offset_in_place()
+        print(f"Offsets: {actor.get_offsets()}")
+        puppet = MujocoPuppet(args.mjcf_name)
 
-    while True:
-        joint_angles = await actor.get_joint_angles()
-        print(joint_angles)
-        await puppet.set_joint_angles(joint_angles)
-        await asyncio.sleep(0.01)
+        puppet.mjcf_path = Path("xmls/robot_fixed.xml")
+
+        while True:
+            # Update joint angles as before
+            orn = await actor.get_orientation()
+            joint_angles = await actor.get_joint_angles()
+            await puppet.set_joint_angles(joint_angles)
+            await puppet.set_orientation((orn[0], orn[1], orn[2], orn[3]))
+            await asyncio.sleep(0.01)
 
 
 if __name__ == "__main__":
