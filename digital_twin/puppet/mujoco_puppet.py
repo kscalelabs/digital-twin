@@ -28,7 +28,7 @@ class MujocoPuppet(Puppet):
         self.name = name
         self.fixed_base = fixed_base
         self.action_lock = asyncio.Lock()
-        self.mjcf_path = None
+        self.mjcf_path: Path | None = None
         self.mj_model: MjModel | None = None
         self.mj_data: MjData | None = None
         self.mj_viewer: mujoco_viewer.MujocoViewer | None = None
@@ -43,7 +43,7 @@ class MujocoPuppet(Puppet):
         self.next_fps_log = 0  # Time when we should next log FPS
         self.fps_log_interval = 5.0  # Log FPS every 5 seconds
 
-    async def get_mjcf_path(self) -> None:
+    async def get_mjcf_path(self) -> Path:
         if self.mjcf_path is not None:
             return self.mjcf_path
         async with self.action_lock:
@@ -130,6 +130,28 @@ class MujocoPuppet(Puppet):
                 self.next_fps_log = now + self.fps_log_interval
 
         self.last_render_time = now
+        mj_viewer.render()
+
+    async def set_orientation(self, quaternion: tuple[float, float, float, float]) -> None:
+        """Set the root orientation of the robot using a quaternion.
+
+        Args:
+            quaternion: Tuple of (w, x, y, z) representing the orientation quaternion.
+        """
+        mj_model, mj_data = await self.get_mj_model_and_data()
+        mj_viewer = await self.get_mj_viewer()
+        if not mj_viewer.is_alive:
+            mj_viewer.close()
+            raise RuntimeError("MuJoCo viewer is not running")
+
+        # The first 7 elements of qpos are for the root joint:
+        # [x, y, z, qw, qx, qy, qz]
+        # We only modify the quaternion part (indices 3-6)
+        w, x, y, z = quaternion
+        mj_data.qpos[3:7] = [w, x, y, z]
+
+        # Update positions
+        mujoco.mj_forward(mj_model, mj_data)
         mj_viewer.render()
 
 

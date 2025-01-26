@@ -13,6 +13,62 @@ from digital_twin.puppet.mujoco_puppet import MujocoPuppet
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class KbotNakedConfigs(RobotConfigs):
+    joint_mapping: dict[str, int] = field(default_factory=lambda: {
+        # Left arm
+        "left_shoulder_pitch_03": 11,
+        "left_shoulder_roll_03": 12,
+        "left_shoulder_yaw_02": 13,
+        "left_elbow_02": 14,
+        "left_wrist_02": 15,
+        # Right arm
+        "right_shoulder_pitch_03": 21,
+        "right_shoulder_roll_03": 22,
+        "right_shoulder_yaw_02": 23,
+        "right_elbow_02": 24,
+        "right_wrist_02": 25,
+        # Left leg
+        "left_hip_pitch_04": 31,
+        "left_hip_roll_03": 32,
+        "left_hip_yaw_03": 33,
+        "left_knee_04": 34,
+        "left_ankle_02": 35,
+        # Right leg
+        "right_hip_pitch_04": 41,
+        "right_hip_roll_03": 42,
+        "right_hip_yaw_03": 43,
+        "right_knee_04": 44,
+        "right_ankle_02": 45
+    })
+
+    signs: dict[str, float] = field(default_factory=lambda: {
+        # Left arm
+        "left_shoulder_pitch_03": 1,
+        "left_shoulder_roll_03": -1,
+        "left_shoulder_yaw_02": 1,
+        "left_elbow_02": 1,
+        "left_wrist_02": 1,
+        # Right arm
+        "right_shoulder_pitch_03": 1,
+        "right_shoulder_roll_03": 1,
+        "right_shoulder_yaw_02": -1,
+        "right_elbow_02": 1,
+        "right_wrist_02": 1,
+        # Left leg
+        "left_hip_pitch_04": 1,
+        "left_hip_roll_03": 1,
+        "left_hip_yaw_03": 1,
+        "left_knee_04": -1,  # Note: has negative limit range
+        "left_ankle_02": 1,
+        # Right leg
+        "right_hip_pitch_04": 1,
+        "right_hip_roll_03": 1,
+        "right_hip_yaw_03": 1,
+        "right_knee_04": -1,
+        "right_ankle_02": -1
+    })
+
 async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("name", type=str, help="Name of the model in the K-Scale API")
