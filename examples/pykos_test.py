@@ -15,57 +15,6 @@ class RobotConfigs:
     joint_mapping: dict[str, int] = field(default_factory=dict)
     signs: dict[str, float] = field(default_factory=dict)
 
-@dataclass
-class ZbotConfigs(RobotConfigs):
-    joint_mapping: dict[str, int] = field(default_factory=lambda: {
-        # Left arm
-        "left_shoulder_yaw": 11,
-        "left_shoulder_pitch": 12,
-        "left_elbow_yaw": 13,
-        "left_gripper": 14,
-        # Right arm
-        "right_shoulder_yaw": 21,
-        "right_shoulder_pitch": 22,
-        "right_elbow_yaw": 23,
-        "right_gripper": 24,
-        # Left leg
-        "left_hip_yaw": 31,
-        "left_hip_roll": 32,
-        "left_hip_pitch": 33,
-        "left_knee_pitch": 34,
-        "left_ankle_pitch": 35,
-        # Right leg
-        "right_hip_yaw": 41,
-        "right_hip_roll": 42,
-        "right_hip_pitch": 43,
-        "right_knee_pitch": 44,
-        "right_ankle_pitch": 45
-    })
-
-    signs: dict[str, float] = field(default_factory=lambda: {
-        # Left arm
-        "left_shoulder_yaw": 1,
-        "left_shoulder_pitch": -1,
-        "left_elbow_yaw": -1,
-        "left_gripper": 1,
-        # Right arm
-        "right_shoulder_yaw": 1,
-        "right_shoulder_pitch": 1,
-        "right_elbow_yaw": 1,
-        "right_gripper": 1,
-        # Left leg
-        "left_hip_yaw": 1,
-        "left_hip_roll": -1,
-        "left_hip_pitch": 1,
-        "left_knee_pitch": 1,
-        "left_ankle_pitch": 1,
-        # Right leg
-        "right_hip_yaw": 1,
-        "right_hip_roll": 1,
-        "right_hip_pitch": 1,
-        "right_knee_pitch": 1,
-        "right_ankle_pitch": 1
-    })
 
 @dataclass
 class KbotConfigs(RobotConfigs):
@@ -188,7 +137,7 @@ async def main() -> None:
     configs: RobotConfigs
     match args.mjcf_name:
         case "zbot-v2":
-            configs = ZbotConfigs()
+            raise NotImplementedError("jx skill issue")
         case "kbot-v1":
             configs = KbotConfigs()
         case _:
