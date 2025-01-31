@@ -4,3 +4,4 @@ colorlogging
 kscale
 pykos
 pynput
+numpy
