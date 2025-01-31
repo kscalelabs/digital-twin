@@ -40,7 +40,7 @@ class MujocoPuppet(Puppet):
         self.last_render_time: float | None = None
         self.fps_window_size = 60  # Calculate average over last 60 frames
         self.frame_times: list[float] = []
-        self.next_fps_log = 0  # Time when we should next log FPS
+        self.next_fps_log = 0.0  # Time when we should next log FPS
         self.fps_log_interval = 5.0  # Log FPS every 5 seconds
 
     async def get_mjcf_path(self) -> Path:

@@ -3,7 +3,9 @@
 import argparse
 import asyncio
 import logging
+from dataclasses import dataclass
 from pathlib import Path
+from typing import TypedDict
 
 import colorlogging
 import kscale
@@ -22,6 +24,17 @@ logger = logging.getLogger(__name__)
 SIMULATION_TIMESTEP = 1 / 240
 
 
+@dataclass
+class JointInfo(TypedDict):
+    id: int
+    type: int
+    lower_limit: float
+    upper_limit: float
+    max_force: float
+    max_velocity: float
+    damping: float
+
+
 class PyBulletPuppet(Puppet):
     """Target robot model using PyBullet."""
 
@@ -29,17 +42,17 @@ class PyBulletPuppet(Puppet):
         self.name = name
         self.fixed_base = fixed_base
         self.action_lock = asyncio.Lock()
-        self.urdf_path = None
-        self.physics_client = None
-        self.robot_id = None
-        self.joint_info = None
-        self.last_time = None
+        self.urdf_path: Path | None = None
+        self.physics_client: int | None = None
+        self.robot_id: int | None = None
+        self.joint_info: dict[str, JointInfo] | None = None
+        self.last_time: float | None = None
 
         # FPS tracking
         self.last_render_time: float | None = None
         self.fps_window_size = 60  # Calculate average over last 60 frames
         self.frame_times: list[float] = []
-        self.next_fps_log = 0  # Time when we should next log FPS
+        self.next_fps_log = 0.0  # Time when we should next log FPS
         self.fps_log_interval = 5.0  # Log FPS every 5 seconds
 
     async def get_urdf_path(self) -> Path:
@@ -140,7 +153,7 @@ class PyBulletPuppet(Puppet):
                         }
 
                 logger.info("Loaded robot with %d controllable joints", len(self.joint_info))
-
+        assert self.robot_id is not None
         return self.robot_id, self.joint_info
 
     async def get_joint_names(self) -> list[str]:

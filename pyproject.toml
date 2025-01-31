@@ -31,9 +31,9 @@ incremental = true
 namespace_packages = false
 
 # Uncomment to exclude modules from Mypy.
-# [[tool.mypy.overrides]]
-# module = []
-# ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = ["pybullet", "pybullet_data", "mujoco", "mujoco_viewer", "scipy"]
+ignore_missing_imports = true
 
 [tool.isort]
 

@@ -1,6 +1,7 @@
 """Defines an actor robot model that allows for keyboard control."""
 
 from pynput import keyboard
+from pynput.keyboard import Key, KeyCode
 
 from digital_twin.actor.base import ActorRobot
 
@@ -26,16 +27,19 @@ class KeyboardActor(ActorRobot):
         self.listener = keyboard.Listener(on_press=self._on_press)
         self.listener.start()
 
-    def _on_press(self, key: keyboard.Key) -> None:
+    def _on_press(self, key: Key | KeyCode | None) -> None:
         """Handle keyboard press events."""
+        if key is None:
+            return
+
         try:
-            if key == keyboard.Key.tab:
+            if key == Key.tab:
                 self._switch_joint()
-            elif key == keyboard.Key.up:
+            elif key == Key.up:
                 self._update_angle(0.1)
-            elif key == keyboard.Key.down:
+            elif key == Key.down:
                 self._update_angle(-0.1)
-            elif key == keyboard.Key.esc:
+            elif key == Key.esc:
                 self.listener.stop()
         except AttributeError:
             pass
