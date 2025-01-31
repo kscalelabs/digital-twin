@@ -180,6 +180,62 @@ class KbotNakedConfigs(RobotConfigs):
         "right_ankle_02": -1
     })
 
+@dataclass
+class PawelKbotConfigs(RobotConfigs):
+    joint_mapping: dict[str, int] = field(default_factory=lambda: {
+        # Left arm
+        "L_shoulder_y_03": 11,
+        "L_shoulder_x_03": 12,
+        "L_shoulder_z_02": 13,
+        "L_elbow_02": 14,
+        "L_wrist_02": 15,
+        # Right arm
+        "R_shoulder_y_03": 21,
+        "R_shoulder_x_03": 22,
+        "R_shoulder_z_02": 23,
+        "R_elbow_02": 24,
+        "R_wrist_02": 25,
+        # Left leg
+        "L_hip_y": 31,
+        "L_hip_x": 32,
+        "L_hip_z": 33,
+        "L_knee": 34,
+        "L_ankle": 35,
+        # Right leg
+        "R_hip_y": 41,
+        "R_hip_x": 42,
+        "R_hip_z": 43,
+        "R_knee": 44,
+        "R_ankle": 45
+    })
+
+    signs: dict[str, float] = field(default_factory=lambda: {
+        # Left arm
+        "L_shoulder_y_03": 1,
+        "L_shoulder_x_03": 1,
+        "L_shoulder_z_02": 1,
+        "L_elbow_02": 1,
+        "L_wrist_02": 1,
+        # Right arm
+        "R_shoulder_y_03": 1,
+        "R_shoulder_x_03": 1,
+        "R_shoulder_z_02": 1,
+        "R_elbow_02": 1,
+        "R_wrist_02": 1,
+        # Left leg
+        "L_hip_y": 1,
+        "L_hip_x": 1,
+        "L_hip_z": 1,
+        "L_knee": -1,
+        "L_ankle": 1,
+        # Right leg
+        "R_hip_y": 1,
+        "R_hip_x": 1,
+        "R_hip_z": 1,
+        "R_knee": 1,
+        "R_ankle": -1
+    })
+
 async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("mjcf_name", type=str, help="Name of the Mujoco model in the K-Scale API")
@@ -191,7 +247,8 @@ async def main() -> None:
         case "zbot-v2":
             configs = ZbotConfigs()
         case "kbot-v1":
-            configs = KbotConfigs()
+            # configs = KbotConfigs()
+            configs = PawelKbotConfigs() # temp for pawel policy
         case "kbot-v1-naked":
             configs = KbotNakedConfigs()
         case _:
@@ -204,7 +261,6 @@ async def main() -> None:
         puppet = MujocoPuppet(args.mjcf_name)
 
         puppet.mjcf_path = Path("xmls/robot_fixed.xml")
-
         while True:
             # Update joint angles as before
             orn = await actor.get_orientation()

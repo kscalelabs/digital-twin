@@ -66,12 +66,15 @@ class PyKOSActor(ActorRobot):
 
     async def get_orientation(self) -> tuple[float, float, float, float]:
         angles = await self.kos.imu.get_euler_angles()
+        print(angles)
         current_quat = scipy.spatial.transform.Rotation.from_euler("xyz", np.deg2rad([angles.roll, angles.pitch, angles.yaw])).as_quat()
         if self.orn_offset is not None:
             # Apply the offset by quaternion multiplication
             offset_rot = scipy.spatial.transform.Rotation.from_quat(self.orn_offset)
             current_rot = scipy.spatial.transform.Rotation.from_quat(current_quat)
-            return (offset_rot * current_rot).as_quat()
+            # returns as quat in the order of w, x, y, z
+            return (offset_rot * current_rot).as_quat(scalar_first=True)
+
         return current_quat
 
     def get_offsets(self) -> dict[str, float] | None:
