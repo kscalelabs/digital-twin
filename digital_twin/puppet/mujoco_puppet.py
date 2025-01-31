@@ -109,6 +109,8 @@ class MujocoPuppet(Puppet):
             if joint_id >= 0:  # Valid joint ID
                 # We're 6-indexed because the first 7 elements of qpos are the root joint
                 mj_data.qpos[joint_id + 6] = target_pos
+            else:
+                logger.warning("Invalid joint name: %s", name)
 
         # Update positions
         mujoco.mj_forward(mj_model, mj_data)

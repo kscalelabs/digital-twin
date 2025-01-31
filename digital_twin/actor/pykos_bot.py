@@ -44,7 +44,12 @@ class PyKOSActor(ActorRobot):
 
     async def get_raw_angles(self) -> dict[int, float]:
         states = await self.kos.actuator.get_actuators_state(self.joint_ids)
-        return {state.actuator_id: state.position for state in states.states}
+        state_dict = {state.actuator_id: state.position for state in states.states}
+        # Check if any joint IDs are missing from state_dict
+        for joint_id in self.joint_ids:
+            if joint_id not in state_dict:
+                print(f"Warning: Joint ID {joint_id} ({self.joint_ids_to_names[joint_id]}) not found in actuator states")
+        return state_dict
 
     async def get_named_angles(self, radians: bool = True) -> dict[str, float]:
         return {self.joint_ids_to_names[id]: math.radians(angle) if radians else angle for id, angle in (await self.get_raw_angles()).items()}
@@ -66,7 +71,6 @@ class PyKOSActor(ActorRobot):
 
     async def get_orientation(self) -> tuple[float, float, float, float]:
         angles = await self.kos.imu.get_euler_angles()
-        print(angles)
         current_quat = scipy.spatial.transform.Rotation.from_euler("xyz", np.deg2rad([angles.roll, angles.pitch, angles.yaw])).as_quat()
         if self.orn_offset is not None:
             # Apply the offset by quaternion multiplication
