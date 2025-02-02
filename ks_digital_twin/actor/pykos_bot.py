@@ -6,7 +6,7 @@ import numpy as np
 import scipy
 from pykos import KOS
 
-from digital_twin.actor.base import ActorRobot
+from ks_digital_twin.actor.base import ActorRobot
 
 
 class PyKOSActor(ActorRobot):

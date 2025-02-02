@@ -3,7 +3,7 @@
 import math
 import time
 
-from digital_twin.actor.base import ActorRobot
+from ks_digital_twin.actor.base import ActorRobot
 
 
 class SinusoidActor(ActorRobot):

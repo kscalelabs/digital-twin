@@ -8,8 +8,8 @@ from pathlib import Path
 import colorlogging
 import kscale
 
-from digital_twin.actor.sinusoid import SinusoidActor
-from digital_twin.puppet.base import Puppet
+from ks_digital_twin.actor.sinusoid import SinusoidActor
+from ks_digital_twin.puppet.base import Puppet
 
 try:
     import mujoco

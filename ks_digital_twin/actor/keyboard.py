@@ -3,7 +3,7 @@
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
 
-from digital_twin.actor.base import ActorRobot
+from ks_digital_twin.actor.base import ActorRobot
 
 
 class KeyboardActor(ActorRobot):

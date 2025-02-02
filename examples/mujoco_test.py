@@ -5,8 +5,8 @@ import asyncio
 
 import colorlogging
 
-from digital_twin.actor.sinusoid import SinusoidActor
-from digital_twin.puppet.mujoco_puppet import MujocoPuppet
+from ks_digital_twin.actor.sinusoid import SinusoidActor
+from ks_digital_twin.puppet.mujoco_puppet import MujocoPuppet
 
 
 async def main() -> None:

@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 
 from pykos import KOS
 
-from digital_twin.actor.pykos_bot import PyKOSActor
-from digital_twin.puppet.mujoco_puppet import MujocoPuppet
+from ks_digital_twin.actor.pykos_bot import PyKOSActor
+from ks_digital_twin.puppet.mujoco_puppet import MujocoPuppet
 
 
 @dataclass

@@ -2,7 +2,7 @@
 
 import time
 
-from digital_twin.actor.keyboard import KeyboardActor
+from ks_digital_twin.actor.keyboard import KeyboardActor
 
 
 def main() -> None:
