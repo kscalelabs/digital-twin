@@ -4,7 +4,7 @@
 
 import re
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding="utf-8") as f:
     long_description: str = f.read()
@@ -35,7 +35,7 @@ setup(
     python_requires=">=3.11",
     install_requires=requirements,
     extras_require={"dev": requirements_dev},
-    packages=["ks_digital_twin"],
+    packages=find_packages(),
     # entry_points={
     #     "console_scripts": [
     #         "digital_twin.cli:main",
