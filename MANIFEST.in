@@ -1,1 +1,4 @@
-recursive-include digital_twin/ *.py *.txt py.typed MANIFEST.in
+include ks_digital_twin/requirements.txt
+include ks_digital_twin/requirements-dev.txt
+
+recursive-include ks_digital_twin *.py *.txt py.typed MANIFEST.in
