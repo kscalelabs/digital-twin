@@ -25,7 +25,7 @@ version: str = version_re.group(1)
 
 
 setup(
-    name="digital_twin",
+    name="ks_digital_twin",
     version=version,
     description="The digital_twin project",
     author="Benjamin Bolte",
@@ -35,7 +35,7 @@ setup(
     python_requires=">=3.11",
     install_requires=requirements,
     extras_require={"dev": requirements_dev},
-    packages=["digital_twin"],
+    packages=["ks_digital_twin"],
     # entry_points={
     #     "console_scripts": [
     #         "digital_twin.cli:main",
