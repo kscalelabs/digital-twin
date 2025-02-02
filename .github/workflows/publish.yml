@@ -14,41 +14,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-wheels:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    name: Build and publish Python package (${{ matrix.os }})
-    timeout-minutes: 10
-    runs-on: ${{ matrix.os }}
+  # build-wheels:
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   name: Build and publish Python package (${{ matrix.os }})
+  #   timeout-minutes: 10
+  #   runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install cibuildwheel
-        shell: bash
+  #     - name: Install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install cibuildwheel
+  #       shell: bash
 
-      - name: Build package
-        env:
-          CIBW_SKIP: "pp* *-musllinux*"  # Skip PyPy and musllinux builds
-        run: |
-          cibuildwheel --output-dir dist
+  #     - name: Build package
+  #       env:
+  #         CIBW_SKIP: "pp* *-musllinux*"  # Skip PyPy and musllinux builds
+  #       run: |
+  #         cibuildwheel --output-dir dist
 
-      - name: Upload wheel artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-${{ matrix.os }}
-          path: |
-            dist/*.whl
+  #     - name: Upload wheel artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: wheels-${{ matrix.os }}
+  #         path: |
+  #           dist/*.whl
 
   build-source-dist:
     name: Build and publish Python package (source distribution)
