@@ -28,7 +28,7 @@ setup(
     name="ks_digital_twin",
     version=version,
     description="The digital_twin project",
-    author="Benjamin Bolte",
+    author="Benjamin Bolte, Wesley Maa, Jingxiang Mo",
     url="https://github.com/kscalelabs/digital-twin",
     long_description=long_description,
     long_description_content_type="text/markdown",
