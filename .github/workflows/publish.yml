@@ -82,7 +82,7 @@ jobs:
             dist/*.tar.gz
 
   publish-wheels:
-    needs: [build-wheels, build-source-dist]
+    needs: [build-source-dist]
     name: Publish Python wheels
     timeout-minutes: 10
     runs-on: ubuntu-latest
